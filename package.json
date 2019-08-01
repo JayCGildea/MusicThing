@@ -1,0 +1,29 @@
+{
+  "name": "music-thing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec babel-node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JayCGildea/MusicThing.git"
+  },
+  "keywords": [],
+  "author": "Jay Gildea",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JayCGildea/MusicThing/issues"
+  },
+  "homepage": "https://github.com/JayCGildea/MusicThing#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/node": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-cli": "^6.26.0",
+    "nodemon": "^1.19.1"
+  }
+}
