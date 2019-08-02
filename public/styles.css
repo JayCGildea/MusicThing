@@ -1,0 +1,41 @@
+body {
+  background-color: black;
+  text-align: center;
+}
+table {
+}
+#main {
+  display: inline-block;
+  position: relative;
+}
+td button {
+  height: 50px;
+  width: 50px;
+  margin: 8px;
+  padding: 0px;
+  border: none;
+  border-radius: 5px;
+
+  background-color: white;
+}
+td button:hover {
+  background-color: white;
+}
+td button.clicked {
+  background-color: blue;
+}
+td button.clicked:hover {
+  background-color: blue;
+}
+#timeline {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  border-left: 5px solid green;
+  animation: draw-line 5s infinite linear;
+  position: absolute;
+}
+@keyframes draw-line {
+  0%   { left: 1% }
+  100% { left: 98%; }
+}

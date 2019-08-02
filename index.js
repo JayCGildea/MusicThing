@@ -1,7 +1,10 @@
 import express from 'express';
 
 const app = express();
-app.listen(3000);
+var server = app.listen(3000);
 
+var host = server.address().address;
+var port = server.address().port;
+console.log('Server listening at http://' + host + ':' + port);
 
-console.log('Hello!');
+app.use(express.static('public'));
