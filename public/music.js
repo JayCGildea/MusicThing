@@ -8,6 +8,7 @@ var context = new AudioContext();
 var socket;
 var currentColumn = 0;
 var master = false;
+var waveform = 'sine';
 
 let buttons = new Array(HEIGHT*WIDTH);
 function makeButtons() {
@@ -227,7 +228,7 @@ function playSound(waveType,startFreq,length) {
 	gainNode.gain.setValueAtTime(1, context.currentTime);
 
   gainNode.gain.setTargetAtTime(
-    0.0001, context.currentTime + (length*4/5), 0.015
+    0.0001, context.currentTime + (length/2), 0.015
   )
 
   // gainNode.gain.exponentialRampToValueAtTime(
@@ -242,27 +243,38 @@ function playSound(waveType,startFreq,length) {
 }
 
 var last = 0;
-function playColumn(now) {
-  if (!last || now - last > (TIME*1000)/WIDTH) {
-    last = now;
+function playColumn() {
 
-    columnIdx = currentColumn;
-    currentColumn = (currentColumn + 1)%WIDTH;
-    for(let rowIdx = 0; rowIdx < HEIGHT; rowIdx++) {
-      if (buttons[(10*rowIdx) + columnIdx].getAttribute('class') === 'clicked') {
-        playSound("sine", notes[rowIdx], TIME/WIDTH);
-        console.log("Play at x: " + rowIdx + " y: " + columnIdx);
-      }
+  columnIdx = currentColumn;
+  currentColumn = (currentColumn + 1)%WIDTH;
+  for(let rowIdx = 0; rowIdx < HEIGHT; rowIdx++) {
+    if (buttons[(10*rowIdx) + columnIdx].getAttribute('class') === 'clicked') {
+      console.log("Play at x: " + rowIdx + " y: " + columnIdx);
+      playSound(waveform, notes[rowIdx], TIME/WIDTH);
     }
   }
-  requestAnimationFrame(playColumn);
 }
 
+
+function changeWaveform(data) {
+  socket.emit('waveform', data);
+  setWaveform(data)
+}
+
+function setWaveform(data) {
+  waveform = data;
+  $(`button.waveform`).removeClass('clicked');
+  $(`button.waveform:contains(${waveform})`).addClass('clicked');
+
+}
+
+let started = false;
 $( document ).ready(function() {
   makeButtons();
   socket = io.connect('http://192.168.100.108:3000');
-  socket.on('init', (buttons) => {
-    initButtonData(buttons);
+  socket.on('init', (data) => {
+    initButtonData(data.buttons);
+    setWaveform(data.waveform);
   });
   socket.on('click', (data) => {
     console.log("Got: " + data.index);
@@ -270,7 +282,16 @@ $( document ).ready(function() {
   });
 
   socket.on('start', (data) => {
-    playColumn(1);
-    $('#timeline').css('animation', 'draw-line 5s infinite linear');
+    if(!started) {
+      console.log("Start");
+      started = true;
+      $('#timeline').css('animation', 'draw-line 5s infinite linear');
+      playColumn();
+      setInterval(playColumn, 500);
+    }
+   });
+
+  socket.on('waveform', (data) => {
+    setWaveform(data);
   });
 });

@@ -12,12 +12,13 @@ app.use(express.static('public'));
 const io = socketIO(server);
 
 var buttons = new Array(10*10).fill(false);
+var waveform = 'sine';
 
 setInterval(() => io.sockets.emit('start'), 5000);
 
 io.on('connection', (socket) => {
   
-  socket.emit('init', buttons);
+  socket.emit('init', {buttons: buttons, waveform: waveform});
 
   console.log('connected');
   socket.on('click', (data) => {
@@ -27,7 +28,13 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('click', data);
   });
 
+  socket.on('waveform', (data) => {
+    waveform = data;
+    socket.broadcast.emit('waveform', data);
+  })
+
   socket.on('disconnect', () => {
   });
+  
 
 });
