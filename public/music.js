@@ -214,13 +214,13 @@ function playSound(waveType,startFreq,length) {
 	
 	gainNode.gain.setValueAtTime(1, context.currentTime);
 
-  gainNode.gain.exponentialRampToValueAtTime(
-    0.7, context.currentTime + (length/2)
+  gainNode.gain.setTargetAtTime(
+    0.0001, context.currentTime + (length*4/5), 0.015
   )
 
-  gainNode.gain.exponentialRampToValueAtTime(
-    0.00001, context.currentTime + length
-  )
+  // gainNode.gain.exponentialRampToValueAtTime(
+  //   0.00001, context.currentTime + length
+  // )
 
 	oscillatorNode.connect(gainNode);
 	gainNode.connect(context.destination);
