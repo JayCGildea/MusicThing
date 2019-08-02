@@ -260,19 +260,17 @@ function playColumn(now) {
 
 $( document ).ready(function() {
   makeButtons();
-  requestAnimationFrame(playColumn);
-  socket = io.connect('http://localhost:3000');
-  socket.on('init',
-    function(buttons) {
-      initButtonData(buttons);
-    }
-  );
+  socket = io.connect('http://192.168.100.108:3000');
+  socket.on('init', (buttons) => {
+    initButtonData(buttons);
+  });
   socket.on('click', (data) => {
     console.log("Got: " + data.index);
     setButton(data.index);
   });
 
-  socket.on('start',(data) => {
-      
+  socket.on('start', (data) => {
+    playColumn(1);
+    $('#timeline').css('animation', 'draw-line 5s infinite linear');
   });
 });

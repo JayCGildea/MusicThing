@@ -13,6 +13,8 @@ const io = socketIO(server);
 
 var buttons = new Array(10*10).fill(false);
 
+setInterval(() => io.sockets.emit('start'), 5000);
+
 io.on('connection', (socket) => {
   
   socket.emit('init', buttons);
