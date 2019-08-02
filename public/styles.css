@@ -28,10 +28,34 @@ td button:hover {
   background-color: white;
 }
 td button.clicked {
-  background-color: blue;
+  background-color: #0ff;
 }
 td button.clicked:hover {
-  background-color: blue;
+  background-color: #0ff;
+}
+td button.sine {
+  background-color: #0ff;
+}
+td button.sine:hover {
+  background-color: #0ff;
+}
+td button.square {
+  background-color: green;
+}
+td button.square:hover {
+  background-color: green;
+}
+td button.triangle {
+  background-color: red;
+}
+td button.triangle:hover {
+  background-color: red;
+}
+td button.sawtooth {
+  background-color: yellow;
+}
+td button.sawtooth:hover {
+  background-color: yellow;
 }
 #timeline {
   top: 0;
@@ -46,11 +70,13 @@ td button.clicked:hover {
 }
 
 button.waveform {
-  width: 100px
+  width: 100px;
+  color: black;
+  mix-blend-mode: difference;
 }
 
 button.waveform:hover {
-  width: 100px
+  width: 100px;
 }
 
 button.waveform.clicked {
@@ -59,4 +85,29 @@ button.waveform.clicked {
 
 button.waveform.clicked:hover {
   background-color: grey;
+}
+
+td button.sine2.clicked {
+  background-color: #0ff;
+}
+td button.sine2.clicked:hover {
+  background-color: #0ff;
+}
+td button.square2.clicked {
+  background-color: green;
+}
+td button.square2.clicked:hover {
+  background-color: green;
+}
+td button.triangle2.clicked {
+  background-color: red;
+}
+td button.triangle2.clicked:hover {
+  background-color: red;
+}
+td button.sawtooth2.clicked {
+  background-color: yellow;
+}
+td button.sawtooth2.clicked:hover {
+  background-color: yellow;
 }

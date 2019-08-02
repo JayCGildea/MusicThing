@@ -10,6 +10,13 @@ var currentColumn = 0;
 var master = false;
 var waveform = 'sine';
 
+const waveforms = [
+	'sine',
+	'square',
+	'triangle',
+	'sawtooth'
+]
+
 let buttons = new Array(HEIGHT*WIDTH);
 function makeButtons() {
   console.log("hi + " + buttons.length);
@@ -34,20 +41,20 @@ function makeButtons() {
 
 function initButtonData(buttonData) {
   for (let i = 0; i < buttonData.length; i++) {
-    buttons[i].setAttribute('class', buttonData[i] ? 'clicked' : '');
+		buttons[i].setAttribute('class', buttonData[i]);
   }
 }
 
 function clickButton(index) {
-  setButton(index);
-  socket.emit('click', {index: index});
+  setButton(index, waveform);
+  socket.emit('click', {index: index, waveform: waveform});
 }
 
-function setButton(index) {
-  if(buttons[index].getAttribute('class') === 'clicked') {
+function setButton(index, waveType) {
+  if(buttons[index].getAttribute('class') === waveType) {
     buttons[index].setAttribute('class', '');
   } else {
-    buttons[index].setAttribute('class', 'clicked');
+    buttons[index].setAttribute('class', waveType);
   }
   console.log('clicked: ' + index);
 }
@@ -220,16 +227,26 @@ const notes = [
 
 function playSound(waveType,startFreq,length) {
 	var oscillatorNode = context.createOscillator();
-	var gainNode = context.createGain();
+  var gainNode = context.createGain();
 	
 	oscillatorNode.type = waveType;
 	oscillatorNode.frequency.setValueAtTime(startFreq, context.currentTime);
-	
-	gainNode.gain.setValueAtTime(1, context.currentTime);
+  
+  
+	if (waveType === 'sine') {
+		gainNode.gain.value = 1;
+	} else if (waveType === 'square') {
+		gainNode.gain.value = 0.6;
+	} else if (waveType === 'triangle') {
+		gainNode.gain.value = 1;
+	} else {
+		gainNode.gain.value = 0.6;
+	}
+	// gainNode.gain.setValueAtTime(1, context.currentTime);
 
-  gainNode.gain.setTargetAtTime(
-    0.0001, context.currentTime + (length/2), 0.015
-  )
+  // gainNode.gain.setTargetAtTime(
+  //   0.0001, context.currentTime + (length*0.8), 0.5
+  // )
 
   // gainNode.gain.exponentialRampToValueAtTime(
   //   0.00001, context.currentTime + length
@@ -248,16 +265,17 @@ function playColumn() {
   columnIdx = currentColumn;
   currentColumn = (currentColumn + 1)%WIDTH;
   for(let rowIdx = 0; rowIdx < HEIGHT; rowIdx++) {
-    if (buttons[(10*rowIdx) + columnIdx].getAttribute('class') === 'clicked') {
+		let waveType = buttons[(10*rowIdx) + columnIdx].getAttribute('class');
+    if (waveType !== '') {
       console.log("Play at x: " + rowIdx + " y: " + columnIdx);
-      playSound(waveform, notes[rowIdx], TIME/WIDTH);
+      playSound(waveType, notes[rowIdx], TIME/WIDTH);
     }
   }
 }
 
 
 function changeWaveform(data) {
-  socket.emit('waveform', data);
+  //socket.emit('waveform', data);
   setWaveform(data)
 }
 
@@ -274,11 +292,11 @@ $( document ).ready(function() {
   socket = io.connect('http://192.168.100.108:3000');
   socket.on('init', (data) => {
     initButtonData(data.buttons);
-    setWaveform(data.waveform);
+    // setWaveform(data.waveform);
   });
   socket.on('click', (data) => {
     console.log("Got: " + data.index);
-    setButton(data.index);
+    setButton(data.index, data.waveform);
   });
 
   socket.on('start', (data) => {
@@ -291,7 +309,7 @@ $( document ).ready(function() {
     }
    });
 
-  socket.on('waveform', (data) => {
-    setWaveform(data);
-  });
+  // socket.on('waveform', (data) => {
+  //   setWaveform(data);
+  // });
 });
