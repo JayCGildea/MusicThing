@@ -2,11 +2,12 @@ const HEIGHT = 10;
 const WIDTH = 10;
 const TIME = 5;
 
-//Create Audio Context
 var AudioContext = window.AudioContext || window.webkitAudioContext;
 var context = new AudioContext();
 
+var socket;
 var currentColumn = 0;
+var master = false;
 
 let buttons = new Array(HEIGHT*WIDTH);
 function makeButtons() {
@@ -30,7 +31,18 @@ function makeButtons() {
  }
 }
 
+function initButtonData(buttonData) {
+  for (let i = 0; i < buttonData.length; i++) {
+    buttons[i].setAttribute('class', buttonData[i] ? 'clicked' : '');
+  }
+}
+
 function clickButton(index) {
+  setButton(index);
+  socket.emit('click', {index: index});
+}
+
+function setButton(index) {
   if(buttons[index].getAttribute('class') === 'clicked') {
     buttons[index].setAttribute('class', '');
   } else {
@@ -229,20 +241,38 @@ function playSound(waveType,startFreq,length) {
 	oscillatorNode.stop(context.currentTime + length);
 }
 
-function playColumn() {
-  columnIdx = currentColumn;
-  currentColumn = (currentColumn + 1)%WIDTH;
-  for(let rowIdx = 0; rowIdx < HEIGHT; rowIdx++) {
-    if (buttons[(10*rowIdx) + columnIdx].getAttribute('class') === 'clicked') {
-      playSound("sine", notes[rowIdx], TIME/WIDTH);
-      console.log("Play at x: " + rowIdx + " y: " + columnIdx);
+var last = 0;
+function playColumn(now) {
+  if (!last || now - last > (TIME*1000)/WIDTH) {
+    last = now;
+
+    columnIdx = currentColumn;
+    currentColumn = (currentColumn + 1)%WIDTH;
+    for(let rowIdx = 0; rowIdx < HEIGHT; rowIdx++) {
+      if (buttons[(10*rowIdx) + columnIdx].getAttribute('class') === 'clicked') {
+        playSound("sine", notes[rowIdx], TIME/WIDTH);
+        console.log("Play at x: " + rowIdx + " y: " + columnIdx);
+      }
     }
   }
+  requestAnimationFrame(playColumn);
 }
 
 $( document ).ready(function() {
   makeButtons();
-  playColumn(0);
-  setInterval(playColumn, (TIME*1000)/WIDTH);
-  
+  requestAnimationFrame(playColumn);
+  socket = io.connect('http://localhost:3000');
+  socket.on('init',
+    function(buttons) {
+      initButtonData(buttons);
+    }
+  );
+  socket.on('click', (data) => {
+    console.log("Got: " + data.index);
+    setButton(data.index);
+  });
+
+  socket.on('start',(data) => {
+      
+  });
 });
